@@ -9,7 +9,8 @@ int main(void)
 	char *line = NULL;
 	size_t len = 0;
 	ssize_t read;
-	char *argv[2];
+	char *argv[100];
+	int i;
 	pid_t child_pid;
 	int status;
 
@@ -25,15 +26,19 @@ int main(void)
 				write(STDOUT_FILENO, "\n", 1);
 			break;
 		}
-
 		if (line[read - 1] == '\n')
 			line[read - 1] = '\0';
 
-		argv[0] = strtok(line, " \t\r\n\a");
+		i = 0;
+		argv[i] = strtok(line, " \t\r\n\a");
+		while (argv[i] != NULL)
+		{
+			i++;
+			argv[i] = strtok(NULL, " \t\r\n\a");
+		}
+
 		if (argv[0] == NULL)
 			continue;
-
-		argv[1] = NULL;
 
 		child_pid = fork();
 		if (child_pid == 0)
