@@ -18,8 +18,10 @@ int main(void)
 		if (isatty(STDIN_FILENO))
 			write(STDOUT_FILENO, "($) ", 4);
 		read = getline(&line, &len, stdin);
-		if (read == -1) /* Handle Ctrl+D (EOF) */
+		if (read == -1)
 		{
+			if (isatty(STDIN_FILENO))
+				write(STDOUT_FILENO, "\n", 1);
 			free(line);
 			exit(EXIT_SUCCESS);
 		}
