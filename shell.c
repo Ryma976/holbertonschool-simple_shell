@@ -1,7 +1,7 @@
 #include "shell.h"
 
 /**
- * main - simple shell 0.1
+ * main - simple shell 0.2 (handling arguments)
  * Return: 0 on success
  */
 int main(void)
