@@ -14,6 +14,8 @@ int main(void)
 	int i;
 	pid_t child_pid;
 	int status;
+	int line_count = 1;
+	int exit_status = 0;
 
 	while (1)
 	{
@@ -44,7 +46,9 @@ int main(void)
 		command_path = find_command(argv[0]);
 		if (command_path == NULL)
 		{
-			perror(argv[0]);
+			fprintf(stderr, "./hsh: %d: %s: not found\n", line_count, argv[0]);
+			exit_status = 127;
+			line_count++;
 			continue;
 		}
 
@@ -59,9 +63,12 @@ int main(void)
 		else
 		{
 			wait(&status);
+			if (WIFEXITED(status))
+				exit_status = WEXITSTATUS(status);
 			free(command_path);
 		}
+		line_count++;
 	}
 	free(line);
-	return (0);
+	return (exit_status);
 }
