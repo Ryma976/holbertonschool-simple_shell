@@ -10,4 +10,7 @@
 
 extern char **environ;
 
+char *_getenv(char *name);
+char *find_command(char *command);
+
 #endif
