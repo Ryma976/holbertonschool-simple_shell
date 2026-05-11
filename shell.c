@@ -1,4 +1,4 @@
-#include "shell.h"
+#include"shell.h"
 
 /**
  * main - simple shell 0.2 (handling arguments)
@@ -10,6 +10,7 @@ int main(void)
 	size_t len = 0;
 	ssize_t read;
 	char *argv[100];
+	char *command_path;
 	int i;
 	pid_t child_pid;
 	int status;
@@ -40,16 +41,25 @@ int main(void)
 		if (argv[0] == NULL)
 			continue;
 
+		command_path = find_command(argv[0]);
+		if (command_path == NULL)
+		{
+			perror(argv[0]);
+			continue;
+		}
+
 		child_pid = fork();
 		if (child_pid == 0)
 		{
-			if (execve(argv[0], argv, environ) == -1)
+			if (execve(command_path, argv, environ) == -1)
 				perror("./hsh");
+			free(command_path);
 			exit(EXIT_FAILURE);
 		}
 		else
 		{
 			wait(&status);
+			free(command_path);
 		}
 	}
 	free(line);
