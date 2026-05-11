@@ -1,0 +1,33 @@
+.TH SIMPLE_SHELL 1 "May 2026" "1.0" "Simple Shell Manual"
+
+.SH NAME
+simple_shell \- simple UNIX command interpreter
+
+.SH SYNOPSIS
+.B ./hsh
+
+.SH DESCRIPTION
+simple_shell is a simple shell that reads commands from the user and executes them.
+It supports commands with arguments, PATH handling, and built-in commands.
+
+.SH USAGE
+Run the shell using:
+.B ./hsh
+
+.SH EXAMPLES
+($) ls
+($) /bin/ls -l
+($) env
+($) exit
+
+.SH BUILTINS
+exit - exit the shell
+env - print environment variables
+
+.SH FILES
+shell.c - main shell file
+shell.h - header file
+path.c - PATH handling
+
+.SH AUTHORS
+Ghadi Alzhrani and Reem Alanazi
