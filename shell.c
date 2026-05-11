@@ -45,7 +45,19 @@ int main(void)
 
 		if (strcmp(argv[0], "exit") == 0)
 			break;
-		
+
+		if (strcmp(argv[0], "env") == 0)
+		{
+			i = 0;
+			while (environ[i] != NULL)
+			{
+				printf("%s\n", environ[i]);
+				i++;
+			}
+			line_count++;
+			continue;
+		}
+
 		command_path = find_command(argv[0]);
 		if (command_path == NULL)
 		{
