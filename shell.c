@@ -43,6 +43,9 @@ int main(void)
 		if (argv[0] == NULL)
 			continue;
 
+		if (strcmp(argv[0], "exit") == 0)
+			break;
+		
 		command_path = find_command(argv[0]);
 		if (command_path == NULL)
 		{
