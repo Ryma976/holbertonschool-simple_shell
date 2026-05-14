@@ -1,7 +1,7 @@
 #include "shell.h"
 
 /**
- * main - simple shell with custom _getline
+ * main - simple shell using custom strtow
  * Return: 0 on success
  */
 int main(void)
@@ -9,10 +9,9 @@ int main(void)
 	char *line = NULL;
 	size_t len = 0;
 	ssize_t read_status;
-	char *argv[100];
-	int i;
+	char **argv;
 	pid_t child_pid;
-	int status;
+	int status, i;
 
 	while (1)
 	{
@@ -30,26 +29,36 @@ int main(void)
 		if (line[read_status - 1] == '\n')
 			line[read_status - 1] = '\0';
 
-		i = 0;
-		argv[i] = strtok(line, " \t\r\n\a");
-		while (argv[i] != NULL)
+		/* Use the new custom tokenizer */
+		argv = strtow(line, " \t\r\n\a");
+		if (argv == NULL || argv[0] == NULL)
 		{
-			i++;
-			argv[i] = strtok(NULL, " \t\r\n\a");
-		}
-
-		if (argv[0] == NULL)
+			if (argv)
+				free(argv);
 			continue;
+		}
 
 		child_pid = fork();
 		if (child_pid == 0)
 		{
 			if (execve(argv[0], argv, environ) == -1)
 				perror("./hsh");
+			
+			/* Free memory before exiting child */
+			for (i = 0; argv[i]; i++)
+				free(argv[i]);
+			free(argv);
+			free(line);
 			exit(EXIT_FAILURE);
 		}
 		else
+		{
 			wait(&status);
+			/* Free argv in parent after command finishes */
+			for (i = 0; argv[i]; i++)
+				free(argv[i]);
+			free(argv);
+		}
 	}
 	free(line);
 	return (0);
