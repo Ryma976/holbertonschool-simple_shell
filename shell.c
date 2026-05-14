@@ -13,6 +13,7 @@ int main(void)
 	int last_status = 0;
 
 	signal(SIGINT, sigint_handler);
+	load_history();
 
 	while (1)
 	{
@@ -30,11 +31,14 @@ int main(void)
 		if (line[read_status - 1] == '\n')
 			line[read_status - 1] = '\0';
 
+		history_add(line);
 		remove_comments(line);
 		handle_separator(line, &last_status);
 	}
 
 	free(line);
+	save_history();
+	free_history();
 	free_aliases();
 	_free_env();
 	return (last_status);
@@ -158,6 +162,11 @@ void run_command(char *cmd, char *line, int *last_status)
 		else
 			*last_status = 0;
 	}
+	else if (strcmp(argv[0], "history") == 0)
+	{
+		_history();
+		*last_status = 0;
+	}
 	else
 		execute_command(argv, line, last_status);
 
@@ -265,6 +274,7 @@ void execute_command(char **argv, char *line, int *last_status)
 			free(argv);
 			free(line);
 			free(cmd_path);
+			free_history();
 			free_aliases();
 			_free_env();
 			_exit(127);
