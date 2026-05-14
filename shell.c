@@ -1,7 +1,7 @@
 #include "shell.h"
 
 /**
- * main - entry point
+ * main - entry point for the simple shell
  * Return: last exit status
  */
 int main(void)
@@ -11,6 +11,9 @@ int main(void)
 	ssize_t read_status;
 	char **argv;
 	int i, last_status = 0;
+
+	/* Register the Ctrl+C signal handler */
+	signal(SIGINT, sigint_handler);
 
 	while (1)
 	{
@@ -45,35 +48,4 @@ int main(void)
 	}
 	free(line);
 	return (last_status);
-}
-
-/**
- * execute_command - forks and runs command
- * @argv: arguments
- * @line: buffer
- * @last_status: pointer to status
- */
-void execute_command(char **argv, char *line, int *last_status)
-{
-	pid_t child_pid;
-	int status, i;
-
-	child_pid = fork();
-	if (child_pid == 0)
-	{
-		if (execve(argv[0], argv, environ) == -1)
-		{
-			perror("./hsh");
-			for (i = 0; argv[i]; i++) free(argv[i]);
-			free(argv);
-			free(line);
-			_exit(127);
-		}
-	}
-	else
-	{
-		wait(&status);
-		if (WIFEXITED(status))
-			*last_status = WEXITSTATUS(status);
-	}
 }
