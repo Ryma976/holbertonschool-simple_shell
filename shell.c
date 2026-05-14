@@ -90,9 +90,6 @@ void run_command(char *cmd, char *line, int *last_status)
 		return;
 	}
 
-	if (strcmp(argv[0], "exit") == 0)
-		handle_exit(argv, line, *last_status);
-
 	if (strcmp(argv[0], "alias") == 0)
 	{
 		if (_alias(cmd) == -1)
@@ -126,7 +123,9 @@ void run_command(char *cmd, char *line, int *last_status)
 	if (argv == NULL || argv[0] == NULL)
 		return;
 
-	if (strcmp(argv[0], "env") == 0)
+	if (strcmp(argv[0], "exit") == 0)
+		handle_exit(argv, line, *last_status);
+	else if (strcmp(argv[0], "env") == 0)
 	{
 		_env();
 		*last_status = 0;
@@ -148,6 +147,13 @@ void run_command(char *cmd, char *line, int *last_status)
 	else if (strcmp(argv[0], "cd") == 0)
 	{
 		if (_cd(argv) == -1)
+			*last_status = 1;
+		else
+			*last_status = 0;
+	}
+	else if (strcmp(argv[0], "help") == 0)
+	{
+		if (_help(argv) == -1)
 			*last_status = 1;
 		else
 			*last_status = 0;
