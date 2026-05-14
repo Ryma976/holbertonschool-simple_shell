@@ -18,6 +18,7 @@ static int set_env_value(char *name, char *value)
 
 	return (_setenv(args));
 }
+
 /**
  * print_cd_error - prints an error for cd
  * @message: error message
@@ -37,6 +38,7 @@ static void print_cd_error(char *message, char *path)
 
 	write(STDERR_FILENO, "\n", 1);
 }
+
 /**
  * get_old_dir - gets the directory before cd
  * @old_alloc: tells if old directory must be freed
@@ -95,12 +97,6 @@ int _cd(char **argv)
 	char *path, *old_dir;
 	int old_alloc, print_path = 0;
 
-	if (argv[1] != NULL && argv[2] != NULL)
-	{
-		print_cd_error("too many arguments", NULL);
-		return (-1);
-	}
-
 	if (argv[1] == NULL)
 	{
 		path = _getenv("HOME");
@@ -112,8 +108,15 @@ int _cd(char **argv)
 		path = _getenv("OLDPWD");
 		if (path == NULL)
 		{
-			print_cd_error("OLDPWD not set", NULL);
-			return (-1);
+			old_dir = get_old_dir(&old_alloc);
+			if (old_dir != NULL)
+			{
+				write(STDOUT_FILENO, old_dir, strlen(old_dir));
+				write(STDOUT_FILENO, "\n", 1);
+			}
+			if (old_alloc == 1)
+				free(old_dir);
+			return (0);
 		}
 		print_path = 1;
 	}
