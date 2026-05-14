@@ -1,54 +1,49 @@
 #include "shell.h"
 
 /**
- * _getline - Reads input from a file descriptor
- * @lineptr: Buffer to store the input
- * @n: Size of the buffer
- * @fd: File descriptor to read from
- *
- * Return: Number of bytes read, or -1 on failure
+ * _getline - custom getline function
+ * @lineptr: buffer storage
+ * @n: size
+ * @fd: file descriptor
+ * Return: bytes read
  */
 ssize_t _getline(char **lineptr, size_t *n, int fd)
 {
 	static char buf[READ_BUF_SIZE];
-	static size_t i, len;
-	size_t count = 0;
+	static size_t pos, size;
+	size_t i = 0;
 	char c;
 
+	if (lineptr == NULL || n == NULL)
+		return (-1);
 	if (*lineptr == NULL || *n == 0)
 	{
 		*n = READ_BUF_SIZE;
 		*lineptr = malloc(*n);
-		if (!(*lineptr))
+		if (!*lineptr)
 			return (-1);
 	}
-
 	while (1)
 	{
-		if (i >= len)
+		if (pos >= size)
 		{
-			len = read(fd, buf, READ_BUF_SIZE);
-			i = 0;
-			if (len <= 0)
-				return (count == 0 ? -1 : (ssize_t)count);
+			size = read(fd, buf, READ_BUF_SIZE);
+			pos = 0;
+			if (size <= 0)
+				return (i == 0 ? -1 : (ssize_t)i);
 		}
-
-		c = buf[i++];
-
-		if (count >= *n - 1)
+		c = buf[pos++];
+		if (i >= *n - 1)
 		{
 			*n += READ_BUF_SIZE;
 			*lineptr = realloc(*lineptr, *n);
-			if (!(*lineptr))
+			if (!*lineptr)
 				return (-1);
 		}
-
-		(*lineptr)[count++] = c;
-
+		(*lineptr)[i++] = c;
 		if (c == '\n')
 			break;
 	}
-
-	(*lineptr)[count] = '\0';
-	return (count);
+	(*lineptr)[i] = '\0';
+	return (i);
 }
