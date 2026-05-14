@@ -9,6 +9,11 @@
 
 #define READ_BUF_SIZE 1024
 
-ssize_t _getline(char **lineptr, size_t *n, int fd);
+/* Global environment variable */
+extern char **environ;
 
+/* Function prototypes */
+ssize_t _getline(char **lineptr, size_t *n, int fd);
+char *find_command(char *command);
+char *_getenv(const char *name);
 #endif
