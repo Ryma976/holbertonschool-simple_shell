@@ -29,7 +29,7 @@ int main(void)
 
 		if (line[read_status - 1] == '\n')
 			line[read_status - 1] = '\0';
-		
+
 		remove_comments(line);
 		handle_separator(line, &last_status);
 	}
