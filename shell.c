@@ -29,7 +29,8 @@ int main(void)
 
 		if (line[read_status - 1] == '\n')
 			line[read_status - 1] = '\0';
-
+		
+		remove_comments(line);
 		handle_separator(line, &last_status);
 	}
 
@@ -37,6 +38,34 @@ int main(void)
 	free_aliases();
 	_free_env();
 	return (last_status);
+}
+
+/**
+ * remove_comments - removes comments from input line
+ * @line: input line
+ *
+ * Return: nothing
+ */
+void remove_comments(char *line)
+{
+	int i;
+
+	if (line == NULL)
+		return;
+
+	for (i = 0; line[i] != '\0'; i++)
+	{
+		if (line[i] == '#')
+		{
+			if (i == 0 || line[i - 1] == ' ' || line[i - 1] == '\t' ||
+			    line[i - 1] == ';' || line[i - 1] == '&' ||
+			    line[i - 1] == '|')
+			{
+				line[i] = '\0';
+				return;
+			}
+		}
+	}
 }
 
 /**
