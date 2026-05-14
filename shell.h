@@ -12,9 +12,10 @@
 
 extern char **environ;
 
-/* Prototypes matches the code files */
+/* Prototypes */
 ssize_t _getline(char **lineptr, size_t *n, int fd);
 char *_getenv(const char *name);
 char *find_command(char *command);
+char **strtow(char *str, char *d); /* Add this line */
 
 #endif
