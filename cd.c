@@ -1,7 +1,7 @@
 #include "shell.h"
 
 /**
- * set_env_value - updates one environment variable
+ * set_env_value - changes one environment variable
  * @name: variable name
  * @value: variable value
  *
@@ -20,9 +20,9 @@ static int set_env_value(char *name, char *value)
 }
 
 /**
- * print_cd_error - prints a cd error message
- * @message: message to print
- * @path: directory path
+ * print_cd_error - prints an error for cd
+ * @message: error message
+ * @path: directory name
  *
  * Return: nothing
  */
@@ -38,19 +38,25 @@ static void print_cd_error(char *message, char *path)
 }
 
 /**
- * get_old_dir - gets the current directory before cd
+ * get_old_dir - gets the directory before cd
+ * @old_alloc: tells if old directory must be freed
  *
- * Return: current directory, or NULL on failure
+ * Return: old directory, or NULL
  */
-static char *get_old_dir(void)
+static char *get_old_dir(int *old_alloc)
 {
 	char *old_dir;
 
+	*old_alloc = 0;
 	old_dir = getcwd(NULL, 0);
-	if (old_dir == NULL)
-		old_dir = _getenv("PWD");
 
-	return (old_dir);
+	if (old_dir != NULL)
+	{
+		*old_alloc = 1;
+		return (old_dir);
+	}
+
+	return (_getenv("PWD"));
 }
 
 /**
@@ -87,27 +93,36 @@ static int update_dirs(char *old_dir)
 int _cd(char **argv)
 {
 	char *path, *old_dir;
-	int old_alloc = 1, print_path = 0;
+	int old_alloc, print_path = 0;
 
-	old_dir = get_old_dir();
-	if (old_dir != NULL && old_dir == _getenv("PWD"))
-		old_alloc = 0;
+	if (argv[1] != NULL && argv[2] != NULL)
+	{
+		print_cd_error("too many arguments", NULL);
+		return (-1);
+	}
 
 	if (argv[1] == NULL)
 	{
 		path = _getenv("HOME");
 		if (path == NULL)
-			return (print_cd_error("HOME not set", NULL), -1);
+			return (0);
 	}
 	else if (strcmp(argv[1], "-") == 0)
 	{
 		path = _getenv("OLDPWD");
 		if (path == NULL)
-			return (print_cd_error("OLDPWD not set", NULL), -1);
+		{
+			print_cd_error("OLDPWD not set", NULL);
+			return (-1);
+		}
 		print_path = 1;
 	}
 	else
+	{
 		path = argv[1];
+	}
+
+	old_dir = get_old_dir(&old_alloc);
 
 	if (chdir(path) == -1)
 	{
@@ -118,13 +133,20 @@ int _cd(char **argv)
 	}
 
 	if (update_dirs(old_dir) == -1)
+	{
+		if (old_alloc == 1)
+			free(old_dir);
 		return (-1);
+	}
 
 	if (print_path == 1)
 	{
 		path = _getenv("PWD");
-		write(STDOUT_FILENO, path, strlen(path));
-		write(STDOUT_FILENO, "\n", 1);
+		if (path != NULL)
+		{
+			write(STDOUT_FILENO, path, strlen(path));
+			write(STDOUT_FILENO, "\n", 1);
+		}
 	}
 
 	if (old_alloc == 1)
