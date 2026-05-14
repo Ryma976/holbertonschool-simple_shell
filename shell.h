@@ -4,13 +4,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <sys/types.h>
-#include <sys/wait.h>
-#include <string.h>
+#include <fcntl.h>
+#include <limits.h>
 
-extern char **environ;
+#define READ_BUF_SIZE 1024
 
-char *_getenv(char *name);
-char *find_command(char *command);
+ssize_t _getline(char **lineptr, size_t *n, int fd);
 
 #endif
