@@ -17,8 +17,9 @@ int main(void)
 	while (1)
 	{
 		if (isatty(STDIN_FILENO))
-			write(STDOUT_FILENO, "($) ", 4);read_status = _getline(&line, &len, STDIN_FILENO);
-		
+			write(STDOUT_FILENO, "($) ", 4);
+
+		read_status = _getline(&line, &len, STDIN_FILENO);
 		if (read_status == -1)
 		{
 			if (isatty(STDIN_FILENO))
@@ -48,9 +49,7 @@ int main(void)
 			exit(EXIT_FAILURE);
 		}
 		else
-		{
 			wait(&status);
-		}
 	}
 	free(line);
 	return (0);
