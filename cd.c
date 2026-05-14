@@ -18,7 +18,6 @@ static int set_env_value(char *name, char *value)
 
 	return (_setenv(args));
 }
-
 /**
  * print_cd_error - prints an error for cd
  * @message: error message
@@ -28,7 +27,7 @@ static int set_env_value(char *name, char *value)
  */
 static void print_cd_error(char *message, char *path)
 {
-	write(STDERR_FILENO, "cd: ", 4);
+	write(STDERR_FILENO, "./hsh: 1: cd: ", 15);
 	write(STDERR_FILENO, message, strlen(message));
 
 	if (path != NULL)
@@ -36,7 +35,6 @@ static void print_cd_error(char *message, char *path)
 
 	write(STDERR_FILENO, "\n", 1);
 }
-
 /**
  * get_old_dir - gets the directory before cd
  * @old_alloc: tells if old directory must be freed
