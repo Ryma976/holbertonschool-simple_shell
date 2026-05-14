@@ -53,6 +53,7 @@ int main(void)
 		free(argv);
 	}
 	free(line);
+	_free_env();
 	return (last_status);
 }
 
