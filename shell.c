@@ -45,6 +45,8 @@ int main(void)
 			_setenv(argv);
 		else if (strcmp(argv[0], "unsetenv") == 0)
 			_unsetenv(argv);
+		else if (strcmp(argv[0], "cd") == 0)
+			_cd(argv);
 		else
 			execute_command(argv, line, &last_status);
 
