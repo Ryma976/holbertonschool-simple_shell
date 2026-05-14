@@ -46,10 +46,12 @@ int _setenv(char **argv)
 		if (strncmp(environ[i], argv[1], strlen(argv[1])) == 0 &&
 		    environ[i][strlen(argv[1])] == '=')
 		{
+			/* Replace pointer */
 			environ[i] = new_var;
 			return (0);
 		}
 	}
+	
 	environ[i] = new_var;
 	environ[i + 1] = NULL;
 	return (0);
