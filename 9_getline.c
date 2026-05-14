@@ -1,7 +1,7 @@
 #include "shell.h"
 
 /**
- * _getline - custom getline function without using realloc
+ * _getline - custom getline function using only allowed functions
  * @lineptr: buffer storage
  * @n: size
  * @fd: file descriptor
@@ -11,7 +11,7 @@ ssize_t _getline(char **lineptr, size_t *n, int fd)
 {
 	static char buf[READ_BUF_SIZE];
 	static size_t pos, size;
-	size_t i = 0;
+	size_t i = 0, j;
 	char c, *new_ptr;
 
 	if (lineptr == NULL || n == NULL)
@@ -39,13 +39,15 @@ ssize_t _getline(char **lineptr, size_t *n, int fd)
 
 		if (i >= *n - 1)
 		{
-			size_t old_size = *n;
 			*n += READ_BUF_SIZE;
 			new_ptr = malloc(*n);
 			if (!new_ptr)
 				return (-1);
 
-			memcpy(new_ptr, *lineptr, old_size);
+			/* Manual copy instead of memcpy */
+			for (j = 0; j < i; j++)
+				new_ptr[j] = (*lineptr)[j];
+
 			free(*lineptr);
 			*lineptr = new_ptr;
 		}
