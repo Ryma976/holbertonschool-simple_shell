@@ -8,6 +8,9 @@ int _env(void)
 {
 	int i;
 
+	if (environ == NULL)
+		return (0);
+
 	for (i = 0; environ[i]; i++)
 	{
 		write(STDOUT_FILENO, environ[i], strlen(environ[i]));
@@ -43,7 +46,6 @@ int _setenv(char **argv)
 		if (strncmp(environ[i], argv[1], strlen(argv[1])) == 0 &&
 		    environ[i][strlen(argv[1])] == '=')
 		{
-			/* Pointer replacement to avoid leakage in local tests */
 			environ[i] = new_var;
 			return (0);
 		}
