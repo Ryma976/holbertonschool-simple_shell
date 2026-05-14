@@ -18,10 +18,8 @@ int _erratoi(char *s)
 		{
 			result *= 10;
 			result += (s[i] - '0');
-			/* For exit status, we don't need to cap at INT_MAX, 
-			   but we should check for overflow beyond long */
 			if (result > 2147483647)
-				return (result); 
+				return (-1);
 		}
 		else
 			return (-1);
@@ -44,17 +42,24 @@ void handle_exit(char **argv, char *line)
 		exitcheck = _erratoi(argv[1]);
 		if (exitcheck == -1)
 		{
-			/* Custom shells usually print a very specific error format */
-			/* For now, we ensure we don't block numbers like 1000 */
+			/* تطبع رسالة الخطأ بالصيغة المطلوبة */
 			fprintf(stderr, "./hsh: 1: exit: Illegal number: %s\n", argv[1]);
-			return;
+			
+			/* تنظيف الذاكرة قبل الخروج بـ 2 */
+			for (i = 0; argv[i]; i++)
+				free(argv[i]);
+			free(argv);
+			free(line);
+			exit(2); 
 		}
+		
 		for (i = 0; argv[i]; i++)
 			free(argv[i]);
 		free(argv);
 		free(line);
-		exit(exitcheck);
+		exit(exitcheck % 256);
 	}
+	
 	for (i = 0; argv[i]; i++)
 		free(argv[i]);
 	free(argv);
