@@ -37,6 +37,7 @@ int set_alias_from_arg(char *arg);
 char *next_alias_arg(char **line);
 void free_argv_array(char **argv);
 char **replace_alias(char **argv);
+char *replace_variables(char *line, int last_status);
 extern char **environ;
 ssize_t _getline(char **lineptr, size_t *n, int fd);
 char **strtow(char *str, char *d);

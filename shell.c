@@ -50,6 +50,7 @@ int main(void)
 void run_command(char *cmd, char *line, int *last_status)
 {
 	char **argv;
+	char *new_cmd;
 	int i;
 
 	argv = strtow(cmd, " \t\r\n\a");
@@ -59,6 +60,9 @@ void run_command(char *cmd, char *line, int *last_status)
 			free(argv);
 		return;
 	}
+
+	if (strcmp(argv[0], "exit") == 0)
+		handle_exit(argv, line, *last_status);
 
 	if (strcmp(argv[0], "alias") == 0)
 	{
@@ -71,13 +75,29 @@ void run_command(char *cmd, char *line, int *last_status)
 		return;
 	}
 
+	for (i = 0; argv[i]; i++)
+		free(argv[i]);
+	free(argv);
+
+	new_cmd = replace_variables(cmd, *last_status);
+	if (new_cmd == NULL)
+		return;
+
+	argv = strtow(new_cmd, " \t\r\n\a");
+	free(new_cmd);
+
+	if (argv == NULL || argv[0] == NULL)
+	{
+		if (argv)
+			free(argv);
+		return;
+	}
+
 	argv = replace_alias(argv);
 	if (argv == NULL || argv[0] == NULL)
 		return;
 
-	if (strcmp(argv[0], "exit") == 0)
-		handle_exit(argv, line, *last_status);
-	else if (strcmp(argv[0], "env") == 0)
+	if (strcmp(argv[0], "env") == 0)
 	{
 		_env();
 		*last_status = 0;
