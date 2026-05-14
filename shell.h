@@ -8,7 +8,9 @@
 #include <sys/wait.h>
 #include <string.h>
 #include <signal.h>
+#include <fcntl.h>
 
+#define HISTORY_MAX 4096
 #define READ_BUF_SIZE 1024
 
 /**
@@ -57,4 +59,14 @@ char *_getenv(const char *name);
 char *build_path(char *dir, char *cmd);
 char *find_command_path(char *cmd);
 int _cd(char **argv);
+extern char *history_list[HISTORY_MAX];
+extern int history_count;
+extern int history_next;
+
+void history_add(char *line);
+int _history(void);
+void free_history(void);
+char *get_history_path(void);
+void load_history(void);
+void save_history(void);
 #endif
