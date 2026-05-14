@@ -2,28 +2,41 @@
 
 /**
  * main - shell entry point
+ * @argc: argument count
+ * @argv: argument values
  *
  * Return: last exit status
  */
-int main(void)
+int main(int argc, char **argv)
 {
 	char *line = NULL;
 	size_t len = 0;
 	ssize_t read_status;
 	int last_status = 0;
+	int input_fd = STDIN_FILENO;
 
 	signal(SIGINT, sigint_handler);
 	load_history();
 
+	if (argc > 1)
+	{
+		input_fd = open(argv[1], O_RDONLY);
+		if (input_fd == -1)
+		{
+			perror(argv[1]);
+			return (127);
+		}
+	}
+
 	while (1)
 	{
-		if (isatty(STDIN_FILENO))
+		if (input_fd == STDIN_FILENO && isatty(STDIN_FILENO))
 			write(STDOUT_FILENO, "($) ", 4);
 
-		read_status = _getline(&line, &len, STDIN_FILENO);
+		read_status = _getline(&line, &len, input_fd);
 		if (read_status == -1)
 		{
-			if (isatty(STDIN_FILENO))
+			if (input_fd == STDIN_FILENO && isatty(STDIN_FILENO))
 				write(STDOUT_FILENO, "\n", 1);
 			break;
 		}
@@ -35,6 +48,9 @@ int main(void)
 		remove_comments(line);
 		handle_separator(line, &last_status);
 	}
+
+	if (input_fd != STDIN_FILENO)
+		close(input_fd);
 
 	free(line);
 	save_history();
