@@ -46,7 +46,7 @@ int _setenv(char **argv)
 		if (strncmp(environ[i], argv[1], strlen(argv[1])) == 0 &&
 		    environ[i][strlen(argv[1])] == '=')
 		{
-			/* Replace pointer */
+			/* Replace the pointer directly */
 			environ[i] = new_var;
 			return (0);
 		}
