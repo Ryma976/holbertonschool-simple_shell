@@ -23,4 +23,6 @@ int _env(void);
 int _setenv(char **argv);
 int _unsetenv(char **argv);
 void _free_env(void);
+char *_getenv(const char *name);
+int _cd(char **argv);
 #endif
