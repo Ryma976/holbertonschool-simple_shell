@@ -15,7 +15,9 @@ extern char **environ;
 /* Prototypes */
 ssize_t _getline(char **lineptr, size_t *n, int fd);
 char *_getenv(const char *name);
-char *find_command(char *command);
-char **strtow(char *str, char *d); /* Add this line */
+char **strtow(char *str, char *d);
+void handle_exit(char **argv, char *line);
+void execute_command(char **argv, char *line);
+int _erratoi(char *s);
 
 #endif

@@ -36,21 +36,17 @@ int main(void)
 			continue;
 		}
 
-		/* CRITICAL: Built-in exit check MUST be first */
 		if (strcmp(argv[0], "exit") == 0)
 		{
 			handle_exit(argv, line);
-			/* If handle_exit returns, it's due to an error; clean up */
 			for (i = 0; argv[i]; i++)
 				free(argv[i]);
 			free(argv);
 			continue;
 		}
 
-		/* Only if not exit, proceed to fork and execve */
 		execute_command(argv, line);
 
-		/* Cleanup argv after execution */
 		for (i = 0; argv[i]; i++)
 			free(argv[i]);
 		free(argv);
@@ -62,7 +58,7 @@ int main(void)
 /**
  * execute_command - forks and executes a command
  * @argv: argument array
- * @line: original line buffer (for cleanup in child)
+ * @line: original line buffer
  */
 void execute_command(char **argv, char *line)
 {
@@ -79,7 +75,7 @@ void execute_command(char **argv, char *line)
 				free(argv[i]);
 			free(argv);
 			free(line);
-			exit(127);
+			_exit(127);
 		}
 	}
 	else
