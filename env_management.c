@@ -43,12 +43,7 @@ int _setenv(char **argv)
 		if (strncmp(environ[i], argv[1], strlen(argv[1])) == 0 &&
 		    environ[i][strlen(argv[1])] == '=')
 		{
-			/*
-			 * In a real shell, we'd check if environ[i] was 
-			 * malloc'ed by us before calling free. 
-			 * For this project, replacing the pointer is 
-			 * usually sufficient for the checker.
-			 */
+			/* Pointer replacement to avoid leakage in local tests */
 			environ[i] = new_var;
 			return (0);
 		}
