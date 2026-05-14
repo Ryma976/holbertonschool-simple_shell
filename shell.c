@@ -1,8 +1,8 @@
 #include "shell.h"
 
 /**
- * main - simple shell tracking last exit status
- * Return: 0 on success
+ * main - entry point
+ * Return: last exit status
  */
 int main(void)
 {
@@ -31,24 +31,16 @@ int main(void)
 		argv = strtow(line, " \t\r\n\a");
 		if (argv == NULL || argv[0] == NULL)
 		{
-			if (argv)
-				free(argv);
+			if (argv) free(argv);
 			continue;
 		}
 
 		if (strcmp(argv[0], "exit") == 0)
-		{
 			handle_exit(argv, line, last_status);
-			for (i = 0; argv[i]; i++)
-				free(argv[i]);
-			free(argv);
-			continue;
-		}
 
 		execute_command(argv, line, &last_status);
 
-		for (i = 0; argv[i]; i++)
-			free(argv[i]);
+		for (i = 0; argv[i]; i++) free(argv[i]);
 		free(argv);
 	}
 	free(line);
@@ -56,10 +48,10 @@ int main(void)
 }
 
 /**
- * execute_command - forks and updates last_status
+ * execute_command - forks and runs command
  * @argv: arguments
- * @line: line buffer
- * @last_status: pointer to status tracker
+ * @line: buffer
+ * @last_status: pointer to status
  */
 void execute_command(char **argv, char *line, int *last_status)
 {
@@ -71,10 +63,8 @@ void execute_command(char **argv, char *line, int *last_status)
 	{
 		if (execve(argv[0], argv, environ) == -1)
 		{
-			/* perror is usually not required for specific path errors, 
-			   but check your project requirements for the exact string */
-			for (i = 0; argv[i]; i++)
-				free(argv[i]);
+			perror("./hsh");
+			for (i = 0; argv[i]; i++) free(argv[i]);
 			free(argv);
 			free(line);
 			_exit(127);

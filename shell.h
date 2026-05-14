@@ -12,12 +12,11 @@
 
 extern char **environ;
 
-/* Prototypes */
+/* Prototypes updated to include last_status */
 ssize_t _getline(char **lineptr, size_t *n, int fd);
-char *_getenv(const char *name);
 char **strtow(char *str, char *d);
-void handle_exit(char **argv, char *line);
-void execute_command(char **argv, char *line);
+void handle_exit(char **argv, char *line, int last_status);
+void execute_command(char **argv, char *line, int *last_status);
 int _erratoi(char *s);
 
 #endif
