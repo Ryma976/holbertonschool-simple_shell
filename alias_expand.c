@@ -20,24 +20,16 @@ void free_argv_array(char **argv)
 }
 
 /**
- * replace_alias - replaces command name with alias value
- * @argv: command arguments
+ * make_alias_command - builds a new command from alias value
+ * @value: alias value
+ * @argv: old arguments
  *
- * Return: new argv, or old argv
+ * Return: new command string, or NULL on failure
  */
-char **replace_alias(char **argv)
+static char *make_alias_command(char *value, char **argv)
 {
-	char *value;
 	char *new_cmd;
-	char **new_argv;
-	int i, len = 0;
-
-	if (argv == NULL || argv[0] == NULL)
-		return (argv);
-
-	value = get_alias_value(argv[0]);
-	if (value == NULL)
-		return (argv);
+	int i, len;
 
 	len = strlen(value) + 1;
 
@@ -46,7 +38,7 @@ char **replace_alias(char **argv)
 
 	new_cmd = malloc(sizeof(char) * len);
 	if (new_cmd == NULL)
-		return (argv);
+		return (NULL);
 
 	strcpy(new_cmd, value);
 
@@ -56,10 +48,45 @@ char **replace_alias(char **argv)
 		strcat(new_cmd, argv[i]);
 	}
 
-	free_argv_array(argv);
+	return (new_cmd);
+}
 
-	new_argv = strtow(new_cmd, " \t\r\n\a");
-	free(new_cmd);
+/**
+ * replace_alias - replaces alias names with their values
+ * @argv: command arguments
+ *
+ * Return: new argv, or old argv
+ */
+char **replace_alias(char **argv)
+{
+	char *value;
+	char *new_cmd;
+	char **new_argv;
+	int count = 0;
 
-	return (new_argv);
+	if (argv == NULL || argv[0] == NULL)
+		return (argv);
+
+	value = get_alias_value(argv[0]);
+
+	while (value != NULL && count < 20)
+	{
+		new_cmd = make_alias_command(value, argv);
+		if (new_cmd == NULL)
+			return (argv);
+
+		free_argv_array(argv);
+
+		new_argv = strtow(new_cmd, " \t\r\n\a");
+		free(new_cmd);
+
+		if (new_argv == NULL || new_argv[0] == NULL)
+			return (new_argv);
+
+		argv = new_argv;
+		value = get_alias_value(argv[0]);
+		count++;
+	}
+
+	return (argv);
 }
