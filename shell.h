@@ -22,5 +22,5 @@ void sigint_handler(int sig);
 int _env(void);
 int _setenv(char **argv);
 int _unsetenv(char **argv);
-
+void _free_env(void);
 #endif
