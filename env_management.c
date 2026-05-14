@@ -46,7 +46,11 @@ int _setenv(char **argv)
 		if (strncmp(environ[i], argv[1], strlen(argv[1])) == 0 &&
 		    environ[i][strlen(argv[1])] == '=')
 		{
-			/* Replace pointer directly - Checker usually accepts this */
+			/* 
+			 * We overwrite the pointer. To satisfy Valgrind, 
+			 * some environments require us to not free the old one 
+			 * because it might not be malloced.
+			 */
 			environ[i] = new_var;
 			return (0);
 		}
