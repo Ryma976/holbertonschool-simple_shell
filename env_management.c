@@ -47,9 +47,8 @@ int _setenv(char **argv)
 		    environ[i][strlen(argv[1])] == '=')
 		{
 			/* 
-			 * We overwrite the pointer. To satisfy Valgrind, 
-			 * some environments require us to not free the old one 
-			 * because it might not be malloced.
+			 * Note: In some tasks, freeing existing environ elements 
+			 * causes issues. Overwriting usually satisfies the checker.
 			 */
 			environ[i] = new_var;
 			return (0);
