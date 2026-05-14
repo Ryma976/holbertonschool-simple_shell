@@ -23,7 +23,7 @@ int main(int argc, char **argv)
 		input_fd = open(argv[1], O_RDONLY);
 		if (input_fd == -1)
 		{
-			write(STDERR_FILENO, "./hsh: 0: Can't open ", 22);
+			write(STDERR_FILENO, "./hsh: 0: Can't open ", 21);
 			write(STDERR_FILENO, argv[1], strlen(argv[1]));
 			write(STDERR_FILENO, "\n", 1);
 			return (127);
