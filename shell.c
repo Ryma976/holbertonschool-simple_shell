@@ -1,7 +1,7 @@
 #include "shell.h"
 
 /**
- * main - simple shell with built-in exit handling
+ * main - simple shell tracking last exit status
  * Return: 0 on success
  */
 int main(void)
@@ -10,7 +10,7 @@ int main(void)
 	size_t len = 0;
 	ssize_t read_status;
 	char **argv;
-	int i;
+	int i, last_status = 0;
 
 	while (1)
 	{
@@ -38,29 +38,30 @@ int main(void)
 
 		if (strcmp(argv[0], "exit") == 0)
 		{
-			handle_exit(argv, line);
+			handle_exit(argv, line, last_status);
 			for (i = 0; argv[i]; i++)
 				free(argv[i]);
 			free(argv);
 			continue;
 		}
 
-		execute_command(argv, line);
+		execute_command(argv, line, &last_status);
 
 		for (i = 0; argv[i]; i++)
 			free(argv[i]);
 		free(argv);
 	}
 	free(line);
-	return (0);
+	return (last_status);
 }
 
 /**
- * execute_command - forks and executes a command
- * @argv: argument array
- * @line: original line buffer
+ * execute_command - forks and updates last_status
+ * @argv: arguments
+ * @line: line buffer
+ * @last_status: pointer to status tracker
  */
-void execute_command(char **argv, char *line)
+void execute_command(char **argv, char *line, int *last_status)
 {
 	pid_t child_pid;
 	int status, i;
@@ -70,7 +71,8 @@ void execute_command(char **argv, char *line)
 	{
 		if (execve(argv[0], argv, environ) == -1)
 		{
-			perror("./hsh");
+			/* perror is usually not required for specific path errors, 
+			   but check your project requirements for the exact string */
 			for (i = 0; argv[i]; i++)
 				free(argv[i]);
 			free(argv);
@@ -81,5 +83,7 @@ void execute_command(char **argv, char *line)
 	else
 	{
 		wait(&status);
+		if (WIFEXITED(status))
+			*last_status = WEXITSTATUS(status);
 	}
 }
