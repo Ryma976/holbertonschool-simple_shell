@@ -1,8 +1,24 @@
 #include "shell.h"
 
 /**
- * _setenv - Initialize a new environment variable, or modify an existing one
- * @argv: array of arguments (setenv VARIABLE VALUE)
+ * _env - prints the current environment
+ * Return: 0 on success
+ */
+int _env(void)
+{
+	int i;
+
+	for (i = 0; environ[i]; i++)
+	{
+		write(STDOUT_FILENO, environ[i], strlen(environ[i]));
+		write(STDOUT_FILENO, "\n", 1);
+	}
+	return (0);
+}
+
+/**
+ * _setenv - Initialize or modify an environment variable
+ * @argv: array of arguments
  * Return: 0 on success, -1 on failure
  */
 int _setenv(char **argv)
@@ -12,14 +28,13 @@ int _setenv(char **argv)
 
 	if (!argv[1] || !argv[2])
 	{
-		fprintf(stderr, "Usage: setenv VARIABLE VALUE\n");
 		return (-1);
 	}
 
-	/* Create string format "VARIABLE=VALUE" */
 	len = strlen(argv[1]) + strlen(argv[2]) + 2;
 	new_var = malloc(len);
-	if (!new_var) return (-1);
+	if (!new_var)
+		return (-1);
 
 	strcpy(new_var, argv[1]);
 	strcat(new_var, "=");
@@ -30,28 +45,26 @@ int _setenv(char **argv)
 		if (strncmp(environ[i], argv[1], strlen(argv[1])) == 0 &&
 		    environ[i][strlen(argv[1])] == '=')
 		{
-			environ[i] = new_var; /* Update existing */
+			environ[i] = new_var;
 			return (0);
 		}
 	}
-	environ[i] = new_var; /* Add new */
+	environ[i] = new_var;
 	environ[i + 1] = NULL;
 	return (0);
 }
 
 /**
  * _unsetenv - Remove an environment variable
- * @argv: array of arguments (unsetenv VARIABLE)
+ * @argv: array of arguments
  * Return: 0 on success, -1 on failure
  */
 int _unsetenv(char **argv)
 {
-	int i, j;
-	int len;
+	int i, j, len;
 
 	if (!argv[1])
 	{
-		fprintf(stderr, "Usage: unsetenv VARIABLE\n");
 		return (-1);
 	}
 
@@ -61,9 +74,7 @@ int _unsetenv(char **argv)
 		if (strncmp(environ[i], argv[1], len) == 0 && environ[i][len] == '=')
 		{
 			for (j = i; environ[j]; j++)
-			{
 				environ[j] = environ[j + 1];
-			}
 			return (0);
 		}
 	}

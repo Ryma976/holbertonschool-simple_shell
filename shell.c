@@ -1,7 +1,7 @@
 #include "shell.h"
 
 /**
- * main - Entry point for the shell
+ * main - shell entry point
  * Return: last exit status
  */
 int main(void)
@@ -12,7 +12,6 @@ int main(void)
 	char **argv;
 	int i, last_status = 0;
 
-	/* Register Ctrl+C handler */
 	signal(SIGINT, sigint_handler);
 
 	while (1)
@@ -33,13 +32,15 @@ int main(void)
 		argv = strtow(line, " \t\r\n\a");
 		if (argv == NULL || argv[0] == NULL)
 		{
-			if (argv) free(argv);
+			if (argv)
+				free(argv);
 			continue;
 		}
 
-		/* Built-ins check */
 		if (strcmp(argv[0], "exit") == 0)
 			handle_exit(argv, line, last_status);
+		else if (strcmp(argv[0], "env") == 0)
+			_env();
 		else if (strcmp(argv[0], "setenv") == 0)
 			_setenv(argv);
 		else if (strcmp(argv[0], "unsetenv") == 0)
@@ -47,13 +48,20 @@ int main(void)
 		else
 			execute_command(argv, line, &last_status);
 
-		for (i = 0; argv[i]; i++) free(argv[i]);
+		for (i = 0; argv[i]; i++)
+			free(argv[i]);
 		free(argv);
 	}
 	free(line);
 	return (last_status);
 }
 
+/**
+ * execute_command - forks and runs command
+ * @argv: args
+ * @line: buffer
+ * @last_status: status pointer
+ */
 void execute_command(char **argv, char *line, int *last_status)
 {
 	pid_t child_pid;
@@ -65,7 +73,8 @@ void execute_command(char **argv, char *line, int *last_status)
 		if (execve(argv[0], argv, environ) == -1)
 		{
 			perror("./hsh");
-			for (i = 0; argv[i]; i++) free(argv[i]);
+			for (i = 0; argv[i]; i++)
+				free(argv[i]);
 			free(argv);
 			free(line);
 			_exit(127);

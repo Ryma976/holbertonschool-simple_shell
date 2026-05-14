@@ -13,17 +13,13 @@
 
 extern char **environ;
 
-/* Prototypes */
 ssize_t _getline(char **lineptr, size_t *n, int fd);
 char **strtow(char *str, char *d);
 void handle_exit(char **argv, char *line, int last_status);
 void execute_command(char **argv, char *line, int *last_status);
 int _erratoi(char *s);
-
-/* Signal Handling (Task 12) */
 void sigint_handler(int sig);
-
-/* Environment Management (Task 13) */
+int _env(void);
 int _setenv(char **argv);
 int _unsetenv(char **argv);
 
