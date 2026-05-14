@@ -60,6 +60,7 @@ void handle_exit(char **argv, char *line, int last_status)
 
 			free(argv);
 			free(line);
+			free_aliases();
 			_free_env();
 			exit(2);
 		}
@@ -69,6 +70,7 @@ void handle_exit(char **argv, char *line, int last_status)
 
 		free(argv);
 		free(line);
+		free_aliases();
 		_free_env();
 		exit(exit_val % 256);
 	}
@@ -78,6 +80,7 @@ void handle_exit(char **argv, char *line, int last_status)
 
 	free(argv);
 	free(line);
+	free_aliases();
 	_free_env();
 	exit(last_status);
 }
