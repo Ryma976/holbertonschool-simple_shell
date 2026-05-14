@@ -62,13 +62,31 @@ void run_command(char *cmd, char *line, int *last_status)
 	if (strcmp(argv[0], "exit") == 0)
 		handle_exit(argv, line, *last_status);
 	else if (strcmp(argv[0], "env") == 0)
+	{
 		_env();
+		*last_status = 0;
+	}
 	else if (strcmp(argv[0], "setenv") == 0)
-		_setenv(argv);
+	{
+		if (_setenv(argv) == -1)
+			*last_status = 1;
+		else
+			*last_status = 0;
+	}
 	else if (strcmp(argv[0], "unsetenv") == 0)
-		_unsetenv(argv);
+	{
+		if (_unsetenv(argv) == -1)
+			*last_status = 1;
+		else
+			*last_status = 0;
+	}
 	else if (strcmp(argv[0], "cd") == 0)
-		_cd(argv);
+	{
+		if (_cd(argv) == -1)
+			*last_status = 1;
+		else
+			*last_status = 0;
+	}
 	else
 		execute_command(argv, line, last_status);
 
@@ -79,7 +97,7 @@ void run_command(char *cmd, char *line, int *last_status)
 }
 
 /**
- * handle_separator - handles commands separated by ;
+ * handle_separator - handles ;, && and || operators
  * @line: input line
  * @last_status: last status value
  *
@@ -88,25 +106,52 @@ void run_command(char *cmd, char *line, int *last_status)
 void handle_separator(char *line, int *last_status)
 {
 	char *cmd;
-	int i;
+	int i, op, run_next = 1;
 
 	cmd = line;
 
 	for (i = 0; ; i++)
 	{
-		if (line[i] == ';' || line[i] == '\0')
+		op = 0;
+
+		if (line[i] == '&' && line[i + 1] == '&')
 		{
-			if (line[i] == ';')
-			{
-				line[i] = '\0';
+			op = 1;
+			line[i] = '\0';
+			i++;
+		}
+		else if (line[i] == '|' && line[i + 1] == '|')
+		{
+			op = 2;
+			line[i] = '\0';
+			i++;
+		}
+		else if (line[i] == ';')
+		{
+			op = 3;
+			line[i] = '\0';
+		}
+		else if (line[i] == '\0')
+		{
+			op = 4;
+		}
+
+		if (op != 0)
+		{
+			if (run_next == 1)
 				run_command(cmd, line, last_status);
-				cmd = line + i + 1;
-			}
-			else
-			{
-				run_command(cmd, line, last_status);
+
+			if (op == 4)
 				break;
-			}
+
+			if (op == 1)
+				run_next = (*last_status == 0);
+			else if (op == 2)
+				run_next = (*last_status != 0);
+			else
+				run_next = 1;
+
+			cmd = line + i + 1;
 		}
 	}
 }
