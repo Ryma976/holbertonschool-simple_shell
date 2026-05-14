@@ -10,14 +10,6 @@
 
 extern char **environ;
 
-/**
- * _getline - Custom getline function using a static buffer
- * @lineptr: Pointer to the buffer that stores the line
- * @n: Size of the buffer
- * @fd: File descriptor to read from
- *
- * Return: Number of bytes read or -1 on failure
- */
 ssize_t _getline(char **lineptr, size_t *n, int fd)
 {
 	static char buf[READ_BUF_SIZE];
@@ -58,12 +50,6 @@ ssize_t _getline(char **lineptr, size_t *n, int fd)
 	return (count);
 }
 
-/**
- * find_path - Locates a command in the PATH environment variable
- * @command: The command to find
- *
- * Return: Full path of the command or NULL if not found
- */
 char *find_path(char *command)
 {
 	char *path = NULL, *path_copy, *token, *full_path;
@@ -90,6 +76,7 @@ char *find_path(char *command)
 	while (token)
 	{
 		full_path = malloc(strlen(token) + strlen(command) + 2);
+		if (!full_path) return (NULL);
 		sprintf(full_path, "%s/%s", token, command);
 		if (stat(full_path, &st) == 0)
 		{
@@ -103,11 +90,6 @@ char *find_path(char *command)
 	return (NULL);
 }
 
-/**
- * main - Main loop for the simple shell
- *
- * Return: Always 0
- */
 int main(void)
 {
 	char *line = NULL, *argv[64], *path;
