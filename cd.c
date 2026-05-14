@@ -27,7 +27,9 @@ static int set_env_value(char *name, char *value)
  */
 static void print_cd_error(char *message, char *path)
 {
-	write(STDERR_FILENO, "./hsh: 1: cd: ", 15);
+	char *prefix = "./hsh: 1: cd: ";
+
+	write(STDERR_FILENO, prefix, strlen(prefix));
 	write(STDERR_FILENO, message, strlen(message));
 
 	if (path != NULL)
