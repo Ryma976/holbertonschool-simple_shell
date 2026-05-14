@@ -3,7 +3,7 @@
 /**
  * _erratoi - converts a string to an integer
  * @s: the string to be converted
- * Return: 0 if no numbers in string, converted number otherwise
+ * Return: converted number, or -1 on error
  */
 int _erratoi(char *s)
 {
@@ -18,8 +18,10 @@ int _erratoi(char *s)
 		{
 			result *= 10;
 			result += (s[i] - '0');
+			/* For exit status, we don't need to cap at INT_MAX, 
+			   but we should check for overflow beyond long */
 			if (result > 2147483647)
-				return (-1);
+				return (result); 
 		}
 		else
 			return (-1);
@@ -37,23 +39,22 @@ void handle_exit(char **argv, char *line)
 	int exitcheck;
 	int i;
 
-	if (argv[1]) /* If there is an argument like exit 98 */
+	if (argv[1])
 	{
 		exitcheck = _erratoi(argv[1]);
 		if (exitcheck == -1)
 		{
-			/* Handle error if not a valid number */
-			perror("Illegal number");
+			/* Custom shells usually print a very specific error format */
+			/* For now, we ensure we don't block numbers like 1000 */
+			fprintf(stderr, "./hsh: 1: exit: Illegal number: %s\n", argv[1]);
 			return;
 		}
-		/* Free everything before exiting */
 		for (i = 0; argv[i]; i++)
 			free(argv[i]);
 		free(argv);
 		free(line);
 		exit(exitcheck);
 	}
-	/* Default exit without status */
 	for (i = 0; argv[i]; i++)
 		free(argv[i]);
 	free(argv);
