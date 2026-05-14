@@ -34,6 +34,7 @@ int main(void)
 	}
 
 	free(line);
+	free_aliases();
 	_free_env();
 	return (last_status);
 }
@@ -58,22 +59,22 @@ void run_command(char *cmd, char *line, int *last_status)
 			free(argv);
 		return;
 	}
+
 	if (strcmp(argv[0], "alias") == 0)
-
 	{
-	if (_alias(cmd) == -1)
-		*last_status = 1;
-	else
-		*last_status = 0;
+		if (_alias(cmd) == -1)
+			*last_status = 1;
+		else
+			*last_status = 0;
 
-	free_argv_array(argv);
-	return;
+		free_argv_array(argv);
+		return;
 	}
-	
-	argv = replace_alias(argv);
 
+	argv = replace_alias(argv);
 	if (argv == NULL || argv[0] == NULL)
-	return;
+		return;
+
 	if (strcmp(argv[0], "exit") == 0)
 		handle_exit(argv, line, *last_status);
 	else if (strcmp(argv[0], "env") == 0)
