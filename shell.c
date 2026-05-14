@@ -1,7 +1,7 @@
 #include "shell.h"
 
 /**
- * main - simple shell using custom strtow
+ * main - simple shell with built-in exit handling
  * Return: 0 on success
  */
 int main(void)
@@ -10,8 +10,7 @@ int main(void)
 	size_t len = 0;
 	ssize_t read_status;
 	char **argv;
-	pid_t child_pid;
-	int status, i;
+	int i;
 
 	while (1)
 	{
@@ -29,7 +28,6 @@ int main(void)
 		if (line[read_status - 1] == '\n')
 			line[read_status - 1] = '\0';
 
-		/* Use the new custom tokenizer */
 		argv = strtow(line, " \t\r\n\a");
 		if (argv == NULL || argv[0] == NULL)
 		{
@@ -38,28 +36,54 @@ int main(void)
 			continue;
 		}
 
-		child_pid = fork();
-		if (child_pid == 0)
+		/* CRITICAL: Built-in exit check MUST be first */
+		if (strcmp(argv[0], "exit") == 0)
 		{
-			if (execve(argv[0], argv, environ) == -1)
-				perror("./hsh");
-			
-			/* Free memory before exiting child */
+			handle_exit(argv, line);
+			/* If handle_exit returns, it's due to an error; clean up */
+			for (i = 0; argv[i]; i++)
+				free(argv[i]);
+			free(argv);
+			continue;
+		}
+
+		/* Only if not exit, proceed to fork and execve */
+		execute_command(argv, line);
+
+		/* Cleanup argv after execution */
+		for (i = 0; argv[i]; i++)
+			free(argv[i]);
+		free(argv);
+	}
+	free(line);
+	return (0);
+}
+
+/**
+ * execute_command - forks and executes a command
+ * @argv: argument array
+ * @line: original line buffer (for cleanup in child)
+ */
+void execute_command(char **argv, char *line)
+{
+	pid_t child_pid;
+	int status, i;
+
+	child_pid = fork();
+	if (child_pid == 0)
+	{
+		if (execve(argv[0], argv, environ) == -1)
+		{
+			perror("./hsh");
 			for (i = 0; argv[i]; i++)
 				free(argv[i]);
 			free(argv);
 			free(line);
-			exit(EXIT_FAILURE);
-		}
-		else
-		{
-			wait(&status);
-			/* Free argv in parent after command finishes */
-			for (i = 0; argv[i]; i++)
-				free(argv[i]);
-			free(argv);
+			exit(127);
 		}
 	}
-	free(line);
-	return (0);
+	else
+	{
+		wait(&status);
+	}
 }
