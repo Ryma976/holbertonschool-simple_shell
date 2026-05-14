@@ -204,12 +204,23 @@ void execute_command(char **argv, char *line, int *last_status)
 {
 	pid_t child_pid;
 	int status, i;
+	char *cmd_path;
+
+	cmd_path = find_command_path(argv[0]);
+	if (cmd_path == NULL)
+	{
+		write(STDERR_FILENO, "./hsh: 1: ", 10);
+		write(STDERR_FILENO, argv[0], strlen(argv[0]));
+		write(STDERR_FILENO, ": not found\n", 12);
+		*last_status = 127;
+		return;
+	}
 
 	child_pid = fork();
 
 	if (child_pid == 0)
 	{
-		if (execve(argv[0], argv, environ) == -1)
+		if (execve(cmd_path, argv, environ) == -1)
 		{
 			perror("./hsh");
 
@@ -218,6 +229,7 @@ void execute_command(char **argv, char *line, int *last_status)
 
 			free(argv);
 			free(line);
+			free(cmd_path);
 			free_aliases();
 			_free_env();
 			_exit(127);
@@ -229,4 +241,6 @@ void execute_command(char **argv, char *line, int *last_status)
 		if (WIFEXITED(status))
 			*last_status = WEXITSTATUS(status);
 	}
+
+	free(cmd_path);
 }

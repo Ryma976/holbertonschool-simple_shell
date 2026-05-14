@@ -52,5 +52,7 @@ int _setenv(char **argv);
 int _unsetenv(char **argv);
 void _free_env(void);
 char *_getenv(const char *name);
+char *build_path(char *dir, char *cmd);
+char *find_command_path(char *cmd);
 int _cd(char **argv);
 #endif
