@@ -95,6 +95,5 @@ int _unsetenv(char **argv)
 			return (0);
 		}
 	}
-	write(STDERR_FILENO, "unsetenv: variable not found\n", 29);
-	return (-1);
+	return (0);
 }
