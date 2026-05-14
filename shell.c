@@ -2,6 +2,7 @@
 
 /**
  * main - shell entry point
+ *
  * Return: last exit status
  */
 int main(void)
@@ -9,8 +10,7 @@ int main(void)
 	char *line = NULL;
 	size_t len = 0;
 	ssize_t read_status;
-	char **argv;
-	int i, last_status = 0;
+	int last_status = 0;
 
 	signal(SIGINT, sigint_handler);
 
@@ -26,37 +26,89 @@ int main(void)
 				write(STDOUT_FILENO, "\n", 1);
 			break;
 		}
+
 		if (line[read_status - 1] == '\n')
 			line[read_status - 1] = '\0';
 
-		argv = strtow(line, " \t\r\n\a");
-		if (argv == NULL || argv[0] == NULL)
-		{
-			if (argv)
-				free(argv);
-			continue;
-		}
-
-		if (strcmp(argv[0], "exit") == 0)
-			handle_exit(argv, line, last_status);
-		else if (strcmp(argv[0], "env") == 0)
-			_env();
-		else if (strcmp(argv[0], "setenv") == 0)
-			_setenv(argv);
-		else if (strcmp(argv[0], "unsetenv") == 0)
-			_unsetenv(argv);
-		else if (strcmp(argv[0], "cd") == 0)
-			_cd(argv);
-		else
-			execute_command(argv, line, &last_status);
-
-		for (i = 0; argv[i]; i++)
-			free(argv[i]);
-		free(argv);
+		handle_separator(line, &last_status);
 	}
+
 	free(line);
 	_free_env();
 	return (last_status);
+}
+
+/**
+ * run_command - runs one command
+ * @cmd: command text
+ * @line: full input line
+ * @last_status: last status value
+ *
+ * Return: nothing
+ */
+void run_command(char *cmd, char *line, int *last_status)
+{
+	char **argv;
+	int i;
+
+	argv = strtow(cmd, " \t\r\n\a");
+	if (argv == NULL || argv[0] == NULL)
+	{
+		if (argv)
+			free(argv);
+		return;
+	}
+
+	if (strcmp(argv[0], "exit") == 0)
+		handle_exit(argv, line, *last_status);
+	else if (strcmp(argv[0], "env") == 0)
+		_env();
+	else if (strcmp(argv[0], "setenv") == 0)
+		_setenv(argv);
+	else if (strcmp(argv[0], "unsetenv") == 0)
+		_unsetenv(argv);
+	else if (strcmp(argv[0], "cd") == 0)
+		_cd(argv);
+	else
+		execute_command(argv, line, last_status);
+
+	for (i = 0; argv[i]; i++)
+		free(argv[i]);
+
+	free(argv);
+}
+
+/**
+ * handle_separator - handles commands separated by ;
+ * @line: input line
+ * @last_status: last status value
+ *
+ * Return: nothing
+ */
+void handle_separator(char *line, int *last_status)
+{
+	char *cmd;
+	int i;
+
+	cmd = line;
+
+	for (i = 0; ; i++)
+	{
+		if (line[i] == ';' || line[i] == '\0')
+		{
+			if (line[i] == ';')
+			{
+				line[i] = '\0';
+				run_command(cmd, line, last_status);
+				cmd = line + i + 1;
+			}
+			else
+			{
+				run_command(cmd, line, last_status);
+				break;
+			}
+		}
+	}
 }
 
 /**
@@ -64,6 +116,8 @@ int main(void)
  * @argv: args
  * @line: buffer
  * @last_status: status pointer
+ *
+ * Return: nothing
  */
 void execute_command(char **argv, char *line, int *last_status)
 {
@@ -71,15 +125,19 @@ void execute_command(char **argv, char *line, int *last_status)
 	int status, i;
 
 	child_pid = fork();
+
 	if (child_pid == 0)
 	{
 		if (execve(argv[0], argv, environ) == -1)
 		{
 			perror("./hsh");
+
 			for (i = 0; argv[i]; i++)
 				free(argv[i]);
+
 			free(argv);
 			free(line);
+			_free_env();
 			_exit(127);
 		}
 	}
