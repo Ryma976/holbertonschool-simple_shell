@@ -45,6 +45,7 @@ void handle_exit(char **argv, char *line, int last_status);
 void execute_command(char **argv, char *line, int *last_status);
 void run_command(char *cmd, char *line, int *last_status);
 void handle_separator(char *line, int *last_status);
+void remove_comments(char *line);
 int _erratoi(char *s);
 void sigint_handler(int sig);
 int _env(void);
