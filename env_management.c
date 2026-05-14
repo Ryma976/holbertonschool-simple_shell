@@ -51,6 +51,7 @@ int _setenv(char **argv)
 		    environ[i][strlen(argv[1])] == '=')
 		{
 			environ[i] = new_var;
+			write(STDOUT_FILENO, "OK\n", 3);
 			return (0);
 		}
 	}
@@ -68,6 +69,7 @@ int _setenv(char **argv)
 	new_environ[count] = new_var;
 	new_environ[count + 1] = NULL;
 	environ = new_environ;
+	write(STDOUT_FILENO, "OK\n", 3);
 	return (0);
 }
 
@@ -92,6 +94,7 @@ int _unsetenv(char **argv)
 		{
 			for (j = i; environ[j]; j++)
 				environ[j] = environ[j + 1];
+			write(STDOUT_FILENO, "OK\n", 3);
 			return (0);
 		}
 	}
