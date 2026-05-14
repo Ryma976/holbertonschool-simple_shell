@@ -4,7 +4,7 @@
  * alias_strdup - copies a string
  * @str: string to copy
  *
- * Return: new string, or NULL
+ * Return: new string, or NULL on failure
  */
 char *alias_strdup(char *str)
 {
@@ -32,6 +32,7 @@ int set_alias_value(char *name, char *value)
 {
 	alias_t *node;
 	alias_t *new_node;
+	alias_t *current;
 	char *new_value;
 
 	node = find_alias(name);
@@ -62,8 +63,20 @@ int set_alias_value(char *name, char *value)
 		return (-1);
 	}
 
-	new_node->next = alias_list;
-	alias_list = new_node;
+	new_node->next = NULL;
+
+	if (alias_list == NULL)
+	{
+		alias_list = new_node;
+		return (0);
+	}
+
+	current = alias_list;
+
+	while (current->next != NULL)
+		current = current->next;
+
+	current->next = new_node;
 
 	return (0);
 }
